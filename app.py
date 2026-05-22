@@ -42,13 +42,7 @@ def carregar_modelo(model_type):
         st.warning("Modelos ou dataset não encontrados.")
 
         try:
-
-            # -------------------------
-            # GERAR DATASET
-            # -------------------------
             if not os.path.exists(caminho_generator):
-
-                st.info("A gerar dataset...")
 
                 resultado = subprocess.run(
                     [sys.executable, "data/generator.py"],
@@ -60,11 +54,6 @@ def carregar_modelo(model_type):
                     st.error("generator.py falhou.")
                     return None
 
-            # -------------------------
-            # TREINAR MODELOS
-            # -------------------------
-            st.info("A treinar modelos...")
-
             resultado = subprocess.run(
                 [sys.executable, "models/trainer.py"],
                 capture_output=True,
@@ -74,8 +63,6 @@ def carregar_modelo(model_type):
             if resultado.returncode != 0:
                 st.error("trainer.py falhou.")
                 return None
-
-            st.success("Modelos treinados!")
 
         except Exception as e:
             st.error(str(e))
@@ -180,7 +167,6 @@ if st.button("Gerar Novos Dados e Treinar Modelos", help="Gera um novo dataset e
                 text=True
             )
         
-        st.success("Dataset gerado e modelos treinados com sucesso! Por favor, atualize a página.")
         # Forçar o recarregamento do modelo após o treino
         modelo = carregar_modelo(selected_model_type)
     except subprocess.CalledProcessError as e:
