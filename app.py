@@ -26,50 +26,93 @@ def carregar_ficheiro_texto(caminho):
 
 @st.cache_resource
 def carregar_modelo(model_type):
+
     caminho_modelo_rf = 'models/modelo_faringite_rf.pkl'
     caminho_modelo_dt = 'models/modelo_faringite_dt.pkl'
     caminho_modelo_mc = 'models/modelo_faringite_mc.pkl'
     caminho_generator = 'data/sintomas_dataset.csv'
 
-    # Se um dos modelos ou o dataset não existir, gera e treina tudo
-    if not os.path.exists(caminho_modelo_rf) or not os.path.exists(caminho_modelo_dt) or not os.path.exists(caminho_modelo_mc) or not os.path.exists(caminho_generator):
+    if (
+        not os.path.exists(caminho_modelo_rf)
+        or not os.path.exists(caminho_modelo_dt)
+        or not os.path.exists(caminho_modelo_mc)
+        or not os.path.exists(caminho_generator)
+    ):
 
-        st.warning("Um ou mais modelos ou o dataset não foram encontrados. A gerar dados e treinar modelos...")
+        st.warning("Modelos ou dataset não encontrados.")
 
         try:
+
+            # -------------------------
+            # GERAR DATASET
+            # -------------------------
             if not os.path.exists(caminho_generator):
-                # Gerar dataset
-                subprocess.run(
+
+                st.info("A gerar dataset...")
+
+                resultado = subprocess.run(
                     [sys.executable, "data/generator.py"],
-                    check=True
+                    capture_output=True,
+                    text=True
                 )
 
-            # Treinar modelo
-            subprocess.run( # trainer.py agora treina e guarda ambos os modelos
+                st.text("STDOUT generator.py")
+                st.code(resultado.stdout)
+
+                st.text("STDERR generator.py")
+                st.code(resultado.stderr)
+
+                if resultado.returncode != 0:
+                    st.error("generator.py falhou.")
+                    return None
+
+            # -------------------------
+            # TREINAR MODELOS
+            # -------------------------
+            st.info("A treinar modelos...")
+
+            resultado = subprocess.run(
                 [sys.executable, "models/trainer.py"],
-                check=True
+                capture_output=True,
+                text=True
             )
 
-            st.success("Modelo treinado com sucesso!")
+            st.text("STDOUT trainer.py")
+            st.code(resultado.stdout)
 
-        except subprocess.CalledProcessError as e:
-            st.error(f"Erro ao executar scripts: {e}")
+            st.text("STDERR trainer.py")
+            st.code(resultado.stderr)
+
+            if resultado.returncode != 0:
+                st.error("trainer.py falhou.")
+                return None
+
+            st.success("Modelos treinados!")
+
+        except Exception as e:
+            st.error(str(e))
             return None
 
-    # Carregar modelo
+    # -------------------------
+    # CARREGAR MODELOS
+    # -------------------------
     try:
+
         if model_type == 'random_forest':
             return joblib.load(caminho_modelo_rf)
+
         elif model_type == 'decision_tree':
             return joblib.load(caminho_modelo_dt)
+
         elif model_type == 'majority_class':
             return joblib.load(caminho_modelo_mc)
+
         else:
-            st.error("Tipo de modelo inválido selecionado.")
+            st.error("Tipo inválido.")
             return None
 
     except Exception as e:
-        st.error(f"Erro ao carregar o modelo {model_type}: {e}")
+        st.error(f"Erro ao carregar modelo: {e}")
         return None
 
 st.title("Assistente IA: Classificação de Faringite")
