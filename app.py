@@ -3,6 +3,7 @@ import subprocess
 import streamlit as st
 import pandas as pd
 import joblib
+import sys
 
 # Configuração da página
 st.set_page_config(page_title="Diagnóstico AI: Faringite", layout="centered")
@@ -39,13 +40,13 @@ def carregar_modelo(model_type):
             if not os.path.exists(caminho_generator):
                 # Gerar dataset
                 subprocess.run(
-                    ["python", "data/generator.py"],
+                    [sys.executable "data/generator.py"],
                     check=True
                 )
 
             # Treinar modelo
             subprocess.run( # trainer.py agora treina e guarda ambos os modelos
-                ["python", "models/trainer.py"],
+                [sys.executable, "models/trainer.py"],
                 check=True
             )
 
