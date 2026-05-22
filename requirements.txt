@@ -6,5 +6,4 @@ matplotlib
 seaborn
 graphviz
 numpy
-os
 subprocess
