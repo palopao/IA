@@ -40,7 +40,7 @@ def carregar_modelo(model_type):
             if not os.path.exists(caminho_generator):
                 # Gerar dataset
                 subprocess.run(
-                    [sys.executable "data/generator.py"],
+                    [sys.executable, "data/generator.py"],
                     check=True
                 )
 
