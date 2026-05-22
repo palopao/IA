@@ -147,33 +147,6 @@ with st.expander("Ver Análise Técnica do Modelo (Exclusivo Médico)"):
     except:
         st.info("Gráfico de desempenho ainda não gerado pelo treinador.")
 
-# Botão para re-gerar dados e treinar modelos
-st.subheader("Manutenção do Modelo")
-if st.button("Gerar Novos Dados e Treinar Modelos", help="Gera um novo dataset e treina ambos os modelos novamente."):
-    st.info("A gerar o dataset e a treinar os modelos. Por favor, aguarde...")
-    try:
-        # Limpar o cache para garantir que os novos modelos e imagens são carregados do disco novamente
-        st.cache_resource.clear()
-        st.cache_data.clear()
-        
-        subprocess.run(
-                    [sys.executable, "data/generator.py"],
-                    capture_output=True,
-                    text=True
-                )
-        subprocess.run(
-                [sys.executable, "models/trainer.py"],
-                capture_output=True,
-                text=True
-            )
-        
-        # Forçar o recarregamento do modelo após o treino
-        modelo = carregar_modelo(selected_model_type)
-    except subprocess.CalledProcessError as e:
-        st.error(f"Erro ao re-gerar dados ou treinar modelos: {e}")
-    except Exception as e:
-        st.error(f"Ocorreu um erro inesperado: {e}")
-
 st.subheader("Dados do Paciente")
 idade = st.number_input("Idade", min_value=1, max_value=100, value=25,
                         help="Idade do paciente em anos.")
