@@ -6,6 +6,8 @@ O sistema utiliza modelos de Machine Learning (Random Forest, Decision Tree e Cl
 
 **Apresentação:** ![presentation](presentation.pdf)
 
+**site:** ![official site](https://faringite-ia.streamlit.app)
+
 ## Funcionalidades
 
 *   **Interface Web:** Desenvolvida com Streamlit para fácil interação.
