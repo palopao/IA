@@ -42,11 +42,18 @@ Para iniciar o assistente, executa:
 python -m streamlit run app.py
 ```
 
+Para criar os gráficos, executa:
+
+```bash
+python models/graphs.py
+```
+
 ## Estrutura do Projeto
 
 *   `app.py`: O ficheiro principal que contém a interface Streamlit.
 *   `data/generator.py`: Script responsável por gerar o dataset `sintomas_dataset.csv`.
-*   `models/trainer.py`: Script que treina os modelos e gera os gráficos/relatórios técnicos.
+*   `models/trainer.py`: Script que treina os modelos e gera o relatórios técnico.
+*   `models/graps.py`: Script que gera os grágicos técnicos.
 *   `models/`: Pasta que armazena os modelos guardados (`.pkl`) e as imagens de análise.
 *   `data/`: Pasta onde o dataset é armazenado.
 

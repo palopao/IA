@@ -2,12 +2,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.tree import DecisionTreeClassifier, export_graphviz
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.dummy import DummyClassifier
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report
 import joblib
-import seaborn as sns
-import graphviz
 
 def treinar_modelo():
     df = pd.read_csv('data/sintomas_dataset.csv')
@@ -35,46 +33,6 @@ def treinar_modelo():
     # --- Treino do DummyClassifier (Classe Maioritária) ---
     modelo_mc = DummyClassifier(strategy='most_frequent')
     modelo_mc.fit(X_train, y_train)
-
-    # Usamos as importâncias do RandomForest para o gráfico e relatório Markdown
-    importances = modelo_rf.feature_importances_
-
-    # Criar DataFrame com pandas
-    importancia_df = pd.DataFrame({
-        'Sintoma': X.columns,
-        'Importancia': importances
-    })
-
-    # Ordenar do mais importante para o menos importante
-    importancia_df = importancia_df.sort_values(
-        by='Importancia',
-        ascending=True
-    )
-
-    importancia_df.plot(
-        kind='barh',
-        x='Sintoma',
-        y='Importancia',
-        legend=False,
-        figsize=(10, 6)
-    )
-
-    plt.title('Importância dos Sintomas no Modelo (Random Forest)')
-    plt.xlabel('Importância')
-    plt.ylabel('Sintomas')
-
-    plt.tight_layout()
-    
-    # Guardar como PNG
-    plt.savefig(
-        'models/importancia_sintomas.png',
-        dpi=300,
-        bbox_inches='tight'
-    )
-
-    plt.close()
-
-    print("Gráfico de importância dos sintomas (Random Forest) guardado em models/importancia_sintomas.png")
     
     # --- Geração do Relatório Comparativo ---
     
@@ -133,75 +91,6 @@ def treinar_modelo():
 
     joblib.dump(modelo_mc, 'models/modelo_faringite_mc.pkl')
     print("Modelo Classe Maioritária guardado em models/modelo_faringite_mc.pkl")
-
-    # --- Gráficos para Decision Tree ---
-    # 1. Gráfico de Importância dos Sintomas (Decision Tree)
-    importancia_dt_df = pd.DataFrame({
-        'Sintoma': X.columns,
-        'Importancia': modelo_dt.feature_importances_
-    }).sort_values(by='Importancia', ascending=True)
-
-    plt.figure(figsize=(10, 6))
-    plt.barh(importancia_dt_df['Sintoma'], importancia_dt_df['Importancia'], color='seagreen')
-    plt.title('Importância dos Sintomas (Decision Tree)')
-    plt.xlabel('Importância')
-    plt.tight_layout()
-    plt.savefig('models/importancia_sintomas_dt.png', dpi=300)
-    plt.close()
-    print("Gráfico de importância (DT) guardado em models/importancia_sintomas_dt.png")
-
-    # 2. Visualização da estrutura da árvore
-    dot_data = export_graphviz(
-    modelo_dt,
-    out_file=None,
-    feature_names=X.columns.tolist(),
-    class_names=['Viral', 'Bacteriana'],
-    filled=True,
-    rounded=True,
-    impurity=False,
-    proportion=True,
-    special_characters=True
-    )
-    dot_data = dot_data.replace(
-    'digraph Tree {',
-    '''digraph Tree {
-    graph [
-        rankdir=TB,
-        splines=true,
-        overlap=false,
-        nodesep=0.3,
-        ranksep=0.6,
-    ];
-    node [
-        fontsize=9,
-        margin="0.15,0.1"
-    ];
-    edge [
-        penwidth=1.0,
-        arrowsize=0.6
-    ];
-    '''
-    )
-    graph = graphviz.Source(dot_data)
-    graph.engine = "twopi"
-    graph.format = "png"
-    output_path = graph.render(
-        filename='estrutura_arvore_dt',
-        directory='models',
-        cleanup=True)
-    print("Árvore guardada em:", output_path)
-
-    # --- Gráfico para Classe Maioritária (Distribuição de Classes) ---
-    plt.figure(figsize=(8, 6))
-    sns.countplot(x=y, hue=y, palette='viridis', legend=False)
-    plt.title('Distribuição de Classes no Dataset (Base da Classe Maioritária)')
-    plt.xlabel('Tipo de Infeção (0: Viral, 1: Bacteriana)')
-    plt.ylabel('Número de Casos')
-    plt.xticks([0, 1], ['Viral', 'Bacteriana'])
-    plt.tight_layout()
-    plt.savefig('models/distribuicao_classes.png', dpi=300)
-    plt.close()
-    print("Gráfico de distribuição de classes guardado em models/distribuicao_classes.png")
 
 if __name__ == "__main__":
     treinar_modelo()
