@@ -56,12 +56,6 @@ def carregar_modelo(model_type):
                     text=True
                 )
 
-                st.text("STDOUT generator.py")
-                st.code(resultado.stdout)
-
-                st.text("STDERR generator.py")
-                st.code(resultado.stderr)
-
                 if resultado.returncode != 0:
                     st.error("generator.py falhou.")
                     return None
@@ -76,12 +70,6 @@ def carregar_modelo(model_type):
                 capture_output=True,
                 text=True
             )
-
-            st.text("STDOUT trainer.py")
-            st.code(resultado.stdout)
-
-            st.text("STDERR trainer.py")
-            st.code(resultado.stderr)
 
             if resultado.returncode != 0:
                 st.error("trainer.py falhou.")
@@ -181,8 +169,16 @@ if st.button("Gerar Novos Dados e Treinar Modelos", help="Gera um novo dataset e
         st.cache_resource.clear()
         st.cache_data.clear()
         
-        subprocess.run(["python", "data/generator.py"], check=True)
-        subprocess.run(["python", "models/trainer.py"], check=True)
+        subprocess.run(
+                    [sys.executable, "data/generator.py"],
+                    capture_output=True,
+                    text=True
+                )
+        subprocess.run(
+                [sys.executable, "models/trainer.py"],
+                capture_output=True,
+                text=True
+            )
         
         st.success("Dataset gerado e modelos treinados com sucesso! Por favor, atualize a página.")
         # Forçar o recarregamento do modelo após o treino
